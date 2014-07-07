@@ -1,6 +1,7 @@
 sbt-concat
 ==========
 [![Build Status](https://api.travis-ci.org/ground5hark/sbt-concat.png?branch=master)](https://travis-ci.org/ground5hark/sbt-concat)
+
 [sbt-web] plugin for concatenating files together, using the sbt-web asset pipeline.
 
 Plugin
@@ -33,4 +34,9 @@ Concat.groups := Seq(
 
 This will produce two files with concatenated contents, `style-group.css` and `script-group.js`.
 
+License
+=======
+This code is licensed under the [MIT License].
+
 [sbt-web]:https://github.com/sbt/sbt-web
+[MIT License]:http://opensource.org/licenses/MIT
