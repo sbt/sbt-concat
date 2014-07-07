@@ -18,7 +18,7 @@ resolvers ++= Seq(
 
 addSbtPlugin("com.typesafe.sbt" %% "sbt-web" % "1.0.2")
 
-publishMavenStyle := false
+publishMavenStyle := true
 
 scriptedSettings
 
@@ -27,3 +27,7 @@ scriptedLaunchOpts ++= Seq(
   "-XX:MaxPermSize=256M",
   s"-Dproject.version=${version.value}"
 )
+
+publishTo := {
+  Some(if (isSnapshot.value) Resolver.sonatypeRepo("snapshots") else Resolver.sonatypeRepo("releases"))
+}
