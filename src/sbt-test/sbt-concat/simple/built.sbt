@@ -1,6 +1,5 @@
 import com.typesafe.sbt.web.Import._
 import com.typesafe.sbt.web.Import.WebKeys._
-
 organization := "net.ground5hark.sbt"
 
 name := "sbt-concat-test"
@@ -12,8 +11,8 @@ scalaVersion := "2.10.4"
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 Concat.groups := Seq(
-  ("style-group.css", Seq("style1.css", "style2.css")),
-  ("script-group.js", Seq("file1.js", "file2.js"))
+  "style-group.css" -> Seq("style1.css", "style2.css"),
+  "script-group.js" -> Seq("file1.js", "file2.js")
 )
 
 pipelineStages := Seq(concat)
