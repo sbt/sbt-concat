@@ -11,6 +11,11 @@ Add the plugin to your `project/plugins.sbt`:
 addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.0")
 ```
 
+Add the [Sonatype releases] resolver:
+```scala
+resolvers += Resolver.sonatypeRepo("releases"),
+```
+
 Enable the [sbt-web] plugin for your project:
 ```scala
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
@@ -27,8 +32,8 @@ Configuration options
 Below is an example of specifying concat groups within your `build.sbt` file:
 ```scala
 Concat.groups := Seq(
-  ("style-group.css", Seq("style1.css", "style2.css")),
-  ("script-group.js", Seq("file1.js", "file2.js"))
+  "style-group.css" -> Seq("style1.css", "style2.css"),
+  "script-group.js" -> Seq("file1.js", "file2.js")
 )
 ```
 
@@ -40,3 +45,4 @@ This code is licensed under the [MIT License].
 
 [sbt-web]:https://github.com/sbt/sbt-web
 [MIT License]:http://opensource.org/licenses/MIT
+[Sonatype releases]:https://oss.sonatype.org/content/repositories/releases/
