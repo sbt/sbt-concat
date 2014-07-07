@@ -29,5 +29,31 @@ scriptedLaunchOpts ++= Seq(
 )
 
 publishTo := {
-  Some(if (isSnapshot.value) Resolver.sonatypeRepo("snapshots") else Resolver.sonatypeRepo("releases"))
+  val nexus = "https://oss.sonatype.org/"
+  Some(if (isSnapshot.value) {
+    "snapshots" at nexus + "content/repositories/snapshots"
+  } else {
+    "releases" at nexus + "service/local/staging/deploy/maven2"
+  })
 }
+
+pomExtra := (
+  <url>https://github.com/ground5hark/sbt-concat</url>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>http://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:ground5hark/sbt-concat.git</url>
+    <connection>scm:git:git@github.com:ground5hark/sbt-concat.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>ground5hark</id>
+      <name>John Bernardo</name>
+      <url>https://github.com/ground5hark</url>
+    </developer>
+  </developers>)
