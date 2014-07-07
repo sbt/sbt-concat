@@ -8,7 +8,7 @@ Plugin
 ======
 Add the plugin to your `project/plugins.sbt`:
 ```scala
-addSbtPlugin(“net.ground5hark.sbt” % “sbt-concat” % “1.0.0”)
+addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "1.0.0")
 ```
 
 Enable the [sbt-web] plugin for your project:
