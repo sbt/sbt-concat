@@ -37,7 +37,8 @@ Concat.groups := Seq(
 )
 ```
 
-This will produce two files with concatenated contents, `style-group.css` and `script-group.js`.
+This will produce two files with concatenated contents, `style-group.css` and `script-group.js`. These will
+reside under the asset build directory in a sub-directory named `concat`.
 
 License
 =======
