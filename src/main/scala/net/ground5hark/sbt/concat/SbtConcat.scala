@@ -41,11 +41,11 @@ object SbtConcat extends AutoPlugin {
     mappings: Seq[PathMapping] =>
       val groupsValue = groups.value
 
-      if (groupsValue.nonEmpty) {
+      val groupMappings = if (groupsValue.nonEmpty) {
         streams.value.log.info(s"Building ${groupsValue.size} concat group(s)")
         val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
         val concatGroups = mutable.Map.empty[String, StringBuilder]
-        mappings.foreach {
+        mappings.view.filter(m => (includeFilter in concat).value.accept(m._1)).foreach {
           case (mappingFile, mappingName) =>
             val mappingBaseName = util.baseName(mappingName)
             if (mappingFile.isFile)
@@ -71,8 +71,10 @@ object SbtConcat extends AutoPlugin {
             (outputFile, s"concat/$groupName")
         }.toSeq
       } else {
-        Seq.empty
-      } ++ mappings
+        Seq.empty[PathMapping]
+      }
+
+      groupMappings ++ mappings
   }
 }
 
