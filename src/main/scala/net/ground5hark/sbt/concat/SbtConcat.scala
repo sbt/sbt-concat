@@ -40,33 +40,39 @@ object SbtConcat extends AutoPlugin {
   private def concatFiles: Def.Initialize[Task[Pipeline.Stage]] = Def.task {
     mappings: Seq[PathMapping] =>
       val groupsValue = groups.value
-      val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
-      val concatGroups = mutable.Map.empty[String, StringBuilder]
-      mappings.foreach {
-        case (mappingFile, mappingName) =>
-          val mappingBaseName = util.baseName(mappingName)
-          if (mappingFile.isFile)
-            // Iterate through each entry until a match is found
-            reverseMapping.takeWhile {
-              case (reverseFileName, reverseGroupName) =>
-                val matches = util.baseName(reverseFileName).equals(mappingBaseName)
-                if (matches) {
-                  concatGroups.getOrElseUpdate(reverseGroupName, new StringBuilder)
-                              .append(s"\n/** $mappingBaseName **/\n")
-                              .append(IO.read(mappingFile))
-                  reverseMapping.remove(reverseFileName)
-                }
-                !matches
-            }
-      }
 
-      val targetDir = (public in Assets).value / "concat"
-      concatGroups.map {
-        case (groupName, concatenatedContents) =>
-          val outputFile = targetDir / groupName
-          IO.write(outputFile, concatenatedContents.toString)
-          (outputFile, s"concat/$groupName")
-      }.toSeq ++ mappings
+      if (groupsValue.nonEmpty) {
+        streams.value.log.info(s"Building ${groupsValue.size} concat group(s)")
+        val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
+        val concatGroups = mutable.Map.empty[String, StringBuilder]
+        mappings.foreach {
+          case (mappingFile, mappingName) =>
+            val mappingBaseName = util.baseName(mappingName)
+            if (mappingFile.isFile)
+              // Iterate through each entry until a match is found
+              reverseMapping.takeWhile {
+                case (reverseFileName, reverseGroupName) =>
+                  val matches = util.baseName(reverseFileName).equals(mappingBaseName)
+                  if (matches) {
+                    concatGroups.getOrElseUpdate(reverseGroupName, new StringBuilder)
+                      .append(s"\n/** $mappingBaseName **/\n")
+                      .append(IO.read(mappingFile))
+                    reverseMapping.remove(reverseFileName)
+                  }
+                  !matches
+              }
+        }
+
+        val targetDir = (public in Assets).value / "concat"
+        concatGroups.map {
+          case (groupName, concatenatedContents) =>
+            val outputFile = targetDir / groupName
+            IO.write(outputFile, concatenatedContents.toString)
+            (outputFile, s"concat/$groupName")
+        }.toSeq
+      } else {
+        Seq.empty
+      } ++ mappings
   }
 }
 
@@ -76,7 +82,6 @@ private object util {
 
 private object ReverseGroupMapping {
   def get(groups: Seq[ConcatGroup], logger: Logger): mutable.Map[String, String] = {
-    logger.info("Getting reverseGroupMapping")
     val ret = mutable.Map.empty[String, String]
     groups.foreach {
       case (groupName, fileNames) => fileNames.foreach { fileName =>

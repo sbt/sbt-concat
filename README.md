@@ -8,7 +8,7 @@ Plugin
 ======
 Add the plugin to your `project/plugins.sbt`:
 ```scala
-addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.0")
+addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.1")
 ```
 
 Add the [Sonatype releases] resolver:
@@ -30,15 +30,33 @@ Configuration options
 =====================
 ### Specifying concat groups
 Below is an example of specifying concat groups within your `build.sbt` file:
+
 ```scala
 Concat.groups := Seq(
   "style-group.css" -> Seq("style1.css", "style2.css"),
-  "script-group.js" -> Seq("file1.js", "file2.js")
+  "script-group.js" -> Seq("script1.js", "script2.js")
 )
 ```
 
-This will produce two files with concatenated contents, `style-group.css` and `script-group.js`. These will
-reside under the asset build directory in a sub-directory named `concat`.
+This will produce two files with concatenated contents:
+
+`style-group.css`
+```css
+/** style1.css **/
+body { color: #000; }
+/** style2.css **/
+#main { background-color: #fff; }
+```
+
+`script-group.js`
+```javascript
+/** script1.js **/
+function onDomReady(){ ... }
+/** script2.js **/
+$(onDomReady);
+```
+
+These will reside under the asset build directory in a sub-directory named `concat`.
 
 License
 =======
