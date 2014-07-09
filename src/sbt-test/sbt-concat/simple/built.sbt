@@ -30,10 +30,10 @@ verifyConcatContents := {
         sys.error(s"${f.getName}: Expected `$s` to be in `$contents`")
     }
   }
-  val containsCss = Seq("background-color: #000;", "/** style2.css **/",
-                        "/** style1.css **/", "font-face: Arial, sans-serif;")
+  val containsCss = Seq("background-color: #000;", "/** css/style2.css **/",
+                        "/** css/style1.css **/", "font-face: Arial, sans-serif;")
   assertEqual(concatCss.head, containsCss)
-  val containsJs = Seq("file1Callback = function() {", "/** file2.js **/",
+  val containsJs = Seq("file1Callback = function() {", "/** js/file2.js **/",
                        "console.log('file2 - callback called');")
   assertEqual(concatJs.head, containsJs)
 }

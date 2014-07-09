@@ -51,7 +51,7 @@ object SbtConcat extends AutoPlugin {
               // Iterate through each entry until a match is found
               reverseMapping.takeWhile {
                 case (reverseFileName, reverseGroupName) =>
-                  val matches = util.baseName(reverseFileName).equals(mappingName)
+                  val matches = reverseFileName.equals(mappingName)
                   if (matches) {
                     concatGroups.getOrElseUpdate(reverseGroupName, new StringBuilder)
                       .append(s"\n/** $mappingName **/\n")
@@ -75,10 +75,6 @@ object SbtConcat extends AutoPlugin {
 
       groupMappings ++ mappings
   }
-}
-
-private object util {
-  def baseName(filePath: String): String = new File(filePath).getName
 }
 
 private object ReverseGroupMapping {
