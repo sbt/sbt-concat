@@ -12,6 +12,7 @@ object Import {
 
   object Concat {
     val groups = SettingKey[Seq[ConcatGroup]]("web-concat-groups", "List of ConcatGroup items")
+    val parentDir = SettingKey[String]("web-concat-parent-dir", "Parent directory name in the target folder to write concatenated files to, default: \"concat\"")
   }
 }
 
@@ -34,6 +35,7 @@ object SbtConcat extends AutoPlugin {
   override def projectSettings = Seq(
     groups := ListBuffer.empty[ConcatGroup],
     includeFilter in concat := NotHiddenFileFilter,
+    parentDir := "concat",
     concat := concatFiles.value
   )
 
@@ -62,7 +64,7 @@ object SbtConcat extends AutoPlugin {
               }
         }
 
-        val targetDir = (public in Assets).value / "concat"
+        val targetDir = (public in Assets).value / parentDir.value
         concatGroups.map {
           case (groupName, concatenatedContents) =>
             val outputFile = targetDir / groupName
