@@ -1,0 +1,10 @@
+> webStage
+$ exists target/web/stage/js/script-group.js
+$ exists target/web/stage/css/style-group.css
+$ exists target/web/public/main/js/script-group.js
+$ exists target/web/public/main/css/style-group.css
+# Stuff not specified in the concat group should still be there
+$ exists target/web/stage/js/file3.js
+
+# Verify contents joined correctly
+> verifyConcatContents

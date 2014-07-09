@@ -11,6 +11,7 @@ object Import {
   val concat = TaskKey[Pipeline.Stage]("web-concat", "Concatenates groups of web assets")
 
   object Concat {
+    val root = SettingKey[String]("web-concat-root", "Root directory for concatenated files")
     val groups = SettingKey[Seq[ConcatGroup]]("web-concat-groups", "List of ConcatGroup items")
   }
 }
@@ -32,6 +33,7 @@ object SbtConcat extends AutoPlugin {
   import Concat._
 
   override def projectSettings = Seq(
+    root := "concat",
     groups := ListBuffer.empty[ConcatGroup],
     includeFilter in concat := NotHiddenFileFilter,
     concat := concatFiles.value
@@ -63,12 +65,13 @@ object SbtConcat extends AutoPlugin {
               }
         }
 
-        val targetDir = (public in Assets).value / "concat"
+        val targetDir = if (root.value.length > 0) (public in Assets).value / root.value else (public in Assets).value
         concatGroups.map {
           case (groupName, concatenatedContents) =>
             val outputFile = targetDir / groupName
             IO.write(outputFile, concatenatedContents.toString)
-            (outputFile, s"concat/$groupName")
+            val relativePath = if (root.value.length > 0) s"${root.value}/$groupName" else groupName
+            (outputFile, relativePath)
         }.toSeq
       } else {
         Seq.empty[PathMapping]
