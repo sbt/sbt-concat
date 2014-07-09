@@ -56,7 +56,16 @@ function onDomReady(){ ... }
 $(onDomReady);
 ```
 
-These will reside under the asset build directory in a sub-directory named `concat`.
+### Specifying the output location
+
+By default the concatenated files will reside under the asset build directory in a sub-directory named `concat`.
+This can be changed by specifying the rhe root property withing you `build.sbt` file.
+
+This will build files directly into the asset build directory:
+
+ ```scala
+ Concat.root := ""
+ ```
 
 License
 =======
