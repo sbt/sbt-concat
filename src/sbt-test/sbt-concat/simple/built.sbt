@@ -4,7 +4,7 @@ organization := "net.ground5hark.sbt"
 
 name := "sbt-concat-test"
 
-version := "0.1.3"
+version := "0.1.4"
 
 scalaVersion := "2.10.4"
 
@@ -37,3 +37,5 @@ verifyConcatContents := {
                        "console.log('file2 - callback called');")
   assertEqual(concatJs.head, containsJs)
 }
+
+// TODO Add a test for concatenation order

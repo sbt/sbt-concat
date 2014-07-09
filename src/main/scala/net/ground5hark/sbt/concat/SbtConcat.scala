@@ -45,23 +45,23 @@ object SbtConcat extends AutoPlugin {
 
       val groupMappings = if (groupsValue.nonEmpty) {
         streams.value.log.info(s"Building ${groupsValue.size} concat group(s)")
+        // Mutable map so we can pop entries we've already seen, in case there are similarly named files
         val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
         val concatGroups = mutable.Map.empty[String, StringBuilder]
-        mappings.view.filter(m => (includeFilter in concat).value.accept(m._1)).foreach {
-          case (mappingFile, mappingName) =>
-            if (mappingFile.isFile)
-              // Iterate through each entry until a match is found
-              reverseMapping.takeWhile {
-                case (reverseFileName, reverseGroupName) =>
-                  val matches = reverseFileName.equals(mappingName)
-                  if (matches) {
-                    concatGroups.getOrElseUpdate(reverseGroupName, new StringBuilder)
-                      .append(s"\n/** $mappingName **/\n")
-                      .append(IO.read(mappingFile))
-                    reverseMapping.remove(reverseFileName)
-                  }
-                  !matches
+        val filteredMappings = mappings.filter(m => (includeFilter in concat).value.accept(m._1) && m._1.isFile)
+
+        groupsValue.foreach {
+          case (groupName, fileNames) =>
+            fileNames.foreach { fileName =>
+              val mapping = filteredMappings.filter(_._2 == fileName)
+              if (mapping.nonEmpty) {
+                // TODO This is not as memory efficient as it could be, write to file instead
+                concatGroups.getOrElseUpdate(groupName, new StringBuilder)
+                  .append(s"\n/** $fileName **/\n")
+                  .append(IO.read(mapping.head._1))
+                reverseMapping.remove(fileName)
               }
+            }
         }
 
         val targetDir = (public in Assets).value / parentDir.value
