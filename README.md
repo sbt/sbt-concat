@@ -8,7 +8,7 @@ Plugin
 ======
 Add the plugin to your `project/plugins.sbt`:
 ```scala
-addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.2")
+addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.3")
 ```
 
 Add the [Sonatype releases] resolver:
@@ -33,8 +33,8 @@ Below is an example of specifying concat groups within your `build.sbt` file:
 
 ```scala
 Concat.groups := Seq(
-  "style-group.css" -> Seq("style1.css", "style2.css"),
-  "script-group.js" -> Seq("script1.js", "script2.js")
+  "style-group.css" -> Seq("css/style1.css", "css/style2.css"),
+  "script-group.js" -> Seq("js/script1.js", "js/script2.js")
 )
 ```
 
@@ -42,17 +42,17 @@ This will produce two files with concatenated contents:
 
 `style-group.css`
 ```css
-/** style1.css **/
+/** css/style1.css **/
 body { color: #000; }
-/** style2.css **/
+/** css/style2.css **/
 #main { background-color: #fff; }
 ```
 
 `script-group.js`
 ```javascript
-/** script1.js **/
+/** js/script1.js **/
 function onDomReady(){ ... }
-/** script2.js **/
+/** js/script2.js **/
 $(onDomReady);
 ```
 

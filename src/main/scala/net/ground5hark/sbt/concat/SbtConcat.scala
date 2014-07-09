@@ -47,15 +47,14 @@ object SbtConcat extends AutoPlugin {
         val concatGroups = mutable.Map.empty[String, StringBuilder]
         mappings.view.filter(m => (includeFilter in concat).value.accept(m._1)).foreach {
           case (mappingFile, mappingName) =>
-            val mappingBaseName = util.baseName(mappingName)
             if (mappingFile.isFile)
               // Iterate through each entry until a match is found
               reverseMapping.takeWhile {
                 case (reverseFileName, reverseGroupName) =>
-                  val matches = util.baseName(reverseFileName).equals(mappingBaseName)
+                  val matches = util.baseName(reverseFileName).equals(mappingName)
                   if (matches) {
                     concatGroups.getOrElseUpdate(reverseGroupName, new StringBuilder)
-                      .append(s"\n/** $mappingBaseName **/\n")
+                      .append(s"\n/** $mappingName **/\n")
                       .append(IO.read(mappingFile))
                     reverseMapping.remove(reverseFileName)
                   }
