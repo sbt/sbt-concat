@@ -69,7 +69,7 @@ object SbtConcat extends AutoPlugin {
           case (groupName, concatenatedContents) =>
             val outputFile = targetDir / groupName
             IO.write(outputFile, concatenatedContents.toString)
-            (outputFile, s"concat/$groupName")
+            (outputFile, s"${parentDir.value}/$groupName")
         }.toSeq
       } else {
         Seq.empty[PathMapping]
