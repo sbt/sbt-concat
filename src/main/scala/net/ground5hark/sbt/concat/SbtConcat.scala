@@ -14,6 +14,13 @@ object Import {
     val groups = SettingKey[Seq[ConcatGroup]]("web-concat-groups", "List of ConcatGroup items")
     val parentDir = SettingKey[String]("web-concat-parent-dir", "Parent directory name in the target folder to write concatenated files to, default: \"concat\"")
   }
+
+  def group(o: AnyRef): Either[Seq[String], PathFinder] = o match {
+    case o: Seq[String] => Left(o)
+    case o: PathFinder => Right(o)
+    case u =>
+      sys.error(s"Can't create a concat group from $u. Must provide either Seq[String] or a PathFinder for the concat group values")
+  }
 }
 
 object NotHiddenFileFilter extends FileFilter {

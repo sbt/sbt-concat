@@ -11,8 +11,9 @@ scalaVersion := "2.10.4"
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 Concat.groups := Seq(
-  "style-group.css" -> Seq("css/style1.css", "css/style2.css"),
-  "script-group.js" -> Seq("js/file1.js", "js/file2.js")
+  "style-group.css" -> group(Seq("css/style1.css", "css/style2.css")),
+  "script-group.js" -> group(Seq("js/file1.js", "js/file2.js")),
+  "style-libs.css" -> group((sourceDirectory.value / "main" / "assets" / "css" / "lib") ** "*.css")
 )
 
 pipelineStages := Seq(concat)
