@@ -14,6 +14,13 @@ object Import {
     val groups = SettingKey[Seq[ConcatGroup]]("web-concat-groups", "List of ConcatGroup items")
     val parentDir = SettingKey[String]("web-concat-parent-dir", "Parent directory name in the target folder to write concatenated files to, default: \"concat\"")
   }
+
+  def group(o: AnyRef): Either[Seq[String], PathFinder] = o match {
+    case o: Seq[String] => Left(o)
+    case o: PathFinder => Right(o)
+    case u =>
+      sys.error(s"Can't create a concat group from $u. Must provide either Seq[String] or a PathFinder for the concat group values")
+  }
 }
 
 object NotHiddenFileFilter extends FileFilter {
@@ -39,9 +46,23 @@ object SbtConcat extends AutoPlugin {
     concat := concatFiles.value
   )
 
+  private def toFileNames(values: Seq[ConcatGroup],
+                          srcDirs: Seq[File], rsrcDirs: Seq[File],
+                          webModuleDirs: Seq[File]): Seq[(String, Iterable[String])] = values.map {
+    case (groupName, fileNames) =>
+      fileNames match {
+        case Left(fileNamesSeq) => (groupName, fileNamesSeq)
+        case Right(fileNamesPathFinder) =>
+          val r = fileNamesPathFinder.pair(relativeTo(srcDirs ++ rsrcDirs ++ webModuleDirs) | flat)
+          (groupName, r.toMap.values)
+        case u => sys.error(s"Expected Seq[String] or PathFinder, but got $u")
+      }
+  }
+
   private def concatFiles: Def.Initialize[Task[Pipeline.Stage]] = Def.task {
     mappings: Seq[PathMapping] =>
-      val groupsValue = groups.value
+      val groupsValue = toFileNames(groups.value, sourceDirectories.value,
+                                    resourceDirectories.value, webModuleDirectories.value)
 
       val groupMappings = if (groupsValue.nonEmpty) {
         streams.value.log.info(s"Building ${groupsValue.size} concat group(s)")
@@ -49,6 +70,7 @@ object SbtConcat extends AutoPlugin {
         val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
         val concatGroups = mutable.Map.empty[String, StringBuilder]
         val filteredMappings = mappings.filter(m => (includeFilter in concat).value.accept(m._1) && m._1.isFile)
+        val targetDir = (public in Assets).value / parentDir.value
 
         groupsValue.foreach {
           case (groupName, fileNames) =>
@@ -64,7 +86,6 @@ object SbtConcat extends AutoPlugin {
             }
         }
 
-        val targetDir = (public in Assets).value / parentDir.value
         concatGroups.map {
           case (groupName, concatenatedContents) =>
             val outputFile = targetDir / groupName
@@ -80,7 +101,7 @@ object SbtConcat extends AutoPlugin {
 }
 
 private object ReverseGroupMapping {
-  def get(groups: Seq[ConcatGroup], logger: Logger): mutable.Map[String, String] = {
+  def get(groups: Seq[(String, Iterable[String])], logger: Logger): mutable.Map[String, String] = {
     val ret = mutable.Map.empty[String, String]
     groups.foreach {
       case (groupName, fileNames) => fileNames.foreach { fileName =>

@@ -32,6 +32,8 @@ Configuration options
 Below is an example of specifying concat groups within your `build.sbt` file:
 
 ```scala
+import net.ground5hark.sbt.concat.SbtConcat.autoImport._
+
 Concat.groups := Seq(
   "style-group.css" -> Seq("css/style1.css", "css/style2.css"),
   "script-group.js" -> Seq("js/script1.js", "js/script2.js")
