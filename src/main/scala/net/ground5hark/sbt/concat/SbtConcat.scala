@@ -16,7 +16,7 @@ object Import {
   }
 
   def group(o: AnyRef): Either[Seq[String], PathFinder] = o match {
-    case o: Seq[String] => Left(o)
+    case o: Seq[_] => Left(o.asInstanceOf[Seq[String]])
     case o: PathFinder => Right(o)
     case u =>
       sys.error(s"Can't create a concat group from $u. Must provide either Seq[String] or a PathFinder for the concat group values")
@@ -47,13 +47,13 @@ object SbtConcat extends AutoPlugin {
   )
 
   private def toFileNames(values: Seq[ConcatGroup],
-                          srcDirs: Seq[File], rsrcDirs: Seq[File],
+                          srcDirs: Seq[File],
                           webModuleDirs: Seq[File]): Seq[(String, Iterable[String])] = values.map {
     case (groupName, fileNames) =>
       fileNames match {
         case Left(fileNamesSeq) => (groupName, fileNamesSeq)
         case Right(fileNamesPathFinder) =>
-          val r = fileNamesPathFinder.pair(relativeTo(srcDirs ++ rsrcDirs ++ webModuleDirs) | flat)
+          val r = fileNamesPathFinder.pair(relativeTo(srcDirs ++ webModuleDirs) | flat)
           (groupName, r.toMap.values)
         case u => sys.error(s"Expected Seq[String] or PathFinder, but got $u")
       }
@@ -61,8 +61,9 @@ object SbtConcat extends AutoPlugin {
 
   private def concatFiles: Def.Initialize[Task[Pipeline.Stage]] = Def.task {
     mappings: Seq[PathMapping] =>
-      val groupsValue = toFileNames(groups.value, sourceDirectories.value,
-                                    resourceDirectories.value, webModuleDirectories.value)
+      val groupsValue = toFileNames(groups.value,
+        (sourceDirectories in Assets).value,
+        (webModuleDirectories in Assets).value)
 
       val groupMappings = if (groupsValue.nonEmpty) {
         streams.value.log.info(s"Building ${groupsValue.size} concat group(s)")

@@ -5,7 +5,7 @@ organization := "net.ground5hark.sbt"
 
 name := "sbt-concat-test"
 
-version := "0.1.5"
+version := "0.1.6"
 
 scalaVersion := "2.10.4"
 
@@ -14,7 +14,7 @@ lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 Concat.groups := Seq(
   "style-group.css" -> group(Seq("css/style1.css", "css/style2.css")),
   "script-group.js" -> group(Seq("js/file1.js", "js/file2.js")),
-  "style-libs.css" -> group((sourceDirectory.value / "main" / "assets" / "css" / "lib") ** "*.css")
+  "style-libs.css" -> group((sourceDirectory.value / "main" / "assets" / "css" / "libs") * "*.css")
 )
 
 pipelineStages := Seq(concat)
@@ -25,6 +25,7 @@ verifyConcatContents := {
   val pub = (public in Assets).value
   val concatCss = (pub / "" ** "*style-group.css").get
   val concatJs = (pub / "" ** "*script-group.js").get
+  val concatLibCss = (pub / "" ** "*style-libs.css").get
   def assertEqual(f: File, contains: Seq[String]): Unit = {
     val contents = IO.read(f)
     contains.foreach { s =>
@@ -38,6 +39,7 @@ verifyConcatContents := {
   val containsJs = Seq("file1Callback = function() {", "/** js/file2.js **/",
                        "console.log('file2 - callback called');")
   assertEqual(concatJs.head, containsJs)
+  val containsLibCss = Seq("font-size: 15em;", "/** css/libs/style2.css **/",
+    "/** css/libs/style1.css **/", "font-weight: bold;")
+  assertEqual(concatLibCss.head, containsLibCss)
 }
-
-// TODO Add a test for concatenation order

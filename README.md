@@ -8,7 +8,7 @@ Plugin
 ======
 Add the plugin to your `project/plugins.sbt`:
 ```scala
-addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.5")
+addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.6")
 ```
 
 Add the [Sonatype releases] resolver:
@@ -29,18 +29,21 @@ pipelineStages := Seq(concat)
 Configuration options
 =====================
 ### Specifying concat groups
-Below is an example of specifying concat groups within your `build.sbt` file:
+Below is an example of specifying concat groups within your `build.sbt` file. You can use `PathFinder` objects or a
+`Seq[String]` to specify the files to concatenate together.
 
 ```scala
-import net.ground5hark.sbt.concat.SbtConcat.autoImport._
-
 Concat.groups := Seq(
-  "style-group.css" -> Seq("css/style1.css", "css/style2.css"),
-  "script-group.js" -> Seq("js/script1.js", "js/script2.js")
+  "style-group.css" -> group(Seq("css/style1.css", "css/style2.css")),
+  "script-group.js" -> group(Seq("js/script1.js", "js/script2.js")),
+  "style-group2.css" -> group((sourceDirectory.value / "assets" / "style") * "*.css")
 )
 ```
 
-This will produce two files with concatenated contents:
+Note that with a `PathFinder`, you will need to take care to ensure that the files it selects will be concatenated in
+the order that you desire.
+
+This will produce three files with concatenated contents:
 
 `style-group.css`
 ```css
@@ -56,6 +59,14 @@ body { color: #000; }
 function onDomReady(){ ... }
 /** js/script2.js **/
 $(onDomReady);
+```
+
+`style-group2.css`
+```css
+/** assets/style/main.css **/
+body { font-weight: bold; }
+/** assets/style/base.css **/
+section { font-size: 15em; }
 ```
 
 These will reside under the asset build directory in a sub-directory named `concat` by default. You can change the name
