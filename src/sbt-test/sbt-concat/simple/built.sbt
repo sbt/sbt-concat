@@ -5,7 +5,7 @@ organization := "net.ground5hark.sbt"
 
 name := "sbt-concat-test"
 
-version := "0.1.6"
+version := "0.1.7"
 
 scalaVersion := "2.10.4"
 
@@ -22,7 +22,7 @@ pipelineStages := Seq(concat)
 val verifyConcatContents = taskKey[Unit]("Verify contents of concatenation groups")
 
 verifyConcatContents := {
-  val pub = (public in Assets).value
+  val pub = webTarget.value
   val concatCss = (pub / "" ** "*style-group.css").get
   val concatJs = (pub / "" ** "*script-group.js").get
   val concatLibCss = (pub / "" ** "*style-libs.css").get
@@ -42,4 +42,18 @@ verifyConcatContents := {
   val containsLibCss = Seq("font-size: 15em;", "/** css/libs/style2.css **/",
     "/** css/libs/style1.css **/", "font-weight: bold;")
   assertEqual(concatLibCss.head, containsLibCss)
+}
+
+val verifyAssetFiles = taskKey[Unit]("Verify that concat groups are files")
+
+verifyAssetFiles := {
+  val pub = webTarget.value
+  val concatCss = (pub / "" ** "*style-group.css").get
+  val concatJs = (pub / "" ** "*script-group.js").get
+  val concatLibCss = (pub / "" ** "*style-libs.css").get
+  Seq(concatCss, concatJs, concatLibCss).foreach { f =>
+    val file = f.head
+    if (!file.isFile || IO.read(file).isEmpty)
+      sys.error(s"$file was not a file or was empty")
+  }
 }

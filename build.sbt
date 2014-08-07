@@ -4,7 +4,7 @@ organization := "net.ground5hark.sbt"
 
 name := "sbt-concat"
 
-version := "0.1.6"
+version := "0.1.7"
 
 scalaVersion := "2.10.4"
 

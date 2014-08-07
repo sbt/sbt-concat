@@ -71,7 +71,7 @@ object SbtConcat extends AutoPlugin {
         val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
         val concatGroups = mutable.Map.empty[String, StringBuilder]
         val filteredMappings = mappings.filter(m => (includeFilter in concat).value.accept(m._1) && m._1.isFile)
-        val targetDir = (public in Assets).value / parentDir.value
+        val targetDir = webTarget.value / parentDir.value
 
         groupsValue.foreach {
           case (groupName, fileNames) =>
