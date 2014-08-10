@@ -11,6 +11,8 @@ scalaVersion := "2.10.4"
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
+Concat.parentDir := "project1"
+
 Concat.groups := {
   val s = java.io.File.separator
   Seq(

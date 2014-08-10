@@ -8,7 +8,7 @@ import collection.mutable
 import mutable.ListBuffer
 
 object Import {
-  val concat = TaskKey[Pipeline.Stage]("web-concat", "Concatenates groups of web assets")
+  val concat = TaskKey[Pipeline.Stage]("concat", "Concatenates groups of web assets")
 
   object Concat {
     val groups = SettingKey[Seq[ConcatGroup]]("web-concat-groups", "List of ConcatGroup items")
@@ -42,7 +42,7 @@ object SbtConcat extends AutoPlugin {
   override def projectSettings = Seq(
     groups := ListBuffer.empty[ConcatGroup],
     includeFilter in concat := NotHiddenFileFilter,
-    parentDir := "concat",
+    parentDir := "",
     concat := concatFiles.value
   )
 
@@ -71,7 +71,7 @@ object SbtConcat extends AutoPlugin {
         val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
         val concatGroups = mutable.Map.empty[String, StringBuilder]
         val filteredMappings = mappings.filter(m => (includeFilter in concat).value.accept(m._1) && m._1.isFile)
-        val targetDir = webTarget.value / parentDir.value
+        val targetDir = webTarget.value / concat.key.label
 
         groupsValue.foreach {
           case (groupName, fileNames) =>
@@ -89,10 +89,10 @@ object SbtConcat extends AutoPlugin {
 
         concatGroups.map {
           case (groupName, concatenatedContents) =>
-            val outputFile = targetDir / groupName
+            val outputFile = targetDir / parentDir.value / groupName
             IO.write(outputFile, concatenatedContents.toString)
-            (outputFile, s"${parentDir.value}/$groupName")
-        }.toSeq
+            outputFile
+        }.pair(relativeTo(targetDir))
       } else {
         Seq.empty[PathMapping]
       }
