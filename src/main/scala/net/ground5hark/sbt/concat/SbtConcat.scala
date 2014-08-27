@@ -12,7 +12,7 @@ object Import {
 
   object Concat {
     val groups = SettingKey[Seq[ConcatGroup]]("web-concat-groups", "List of ConcatGroup items")
-    val parentDir = SettingKey[String]("web-concat-parent-dir", "Parent directory name in the target folder to write concatenated files to, default: \"concat\"")
+    val parentDir = SettingKey[String]("web-concat-parent-dir", "Parent directory name in the target folder to write concatenated files to, default: \"\" (no parentDir)")
   }
 
   def group(o: AnyRef): Either[Seq[String], PathFinder] = o match {
@@ -42,7 +42,7 @@ object SbtConcat extends AutoPlugin {
   override def projectSettings = Seq(
     groups := ListBuffer.empty[ConcatGroup],
     includeFilter in concat := NotHiddenFileFilter,
-    parentDir := "concat",
+    parentDir := "",
     concat := concatFiles.value
   )
 
@@ -90,9 +90,9 @@ object SbtConcat extends AutoPlugin {
         concatGroups.map {
           case (groupName, concatenatedContents) =>
             val outputFile = targetDir / groupName
-            IO.write(outputFile, concatenatedContents.toString)
-            (outputFile, s"${parentDir.value}/$groupName")
-        }.toSeq
+            IO.write(outputFile, concatenatedContents.toString())
+            outputFile
+        }.pair(relativeTo(webTarget.value))
       } else {
         Seq.empty[PathMapping]
       }

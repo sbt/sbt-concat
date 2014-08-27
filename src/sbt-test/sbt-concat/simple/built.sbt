@@ -5,7 +5,7 @@ organization := "net.ground5hark.sbt"
 
 name := "sbt-concat-test"
 
-version := "0.1.7"
+version := "0.1.8"
 
 scalaVersion := "2.10.4"
 
@@ -57,3 +57,4 @@ verifyAssetFiles := {
       sys.error(s"$file was not a file or was empty")
   }
 }
+
