@@ -69,7 +69,7 @@ body { font-weight: bold; }
 section { font-size: 15em; }
 ```
 
-These will reside under the asset build directory in a sub-directory named `concat` by default. You can change the name
+These will reside under the asset build directory in the base target directory by default. You can change the name
 of this directory using the `Concat.parentDir` `SettingKey`.
 
 License
