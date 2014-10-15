@@ -6,6 +6,7 @@ import sbt._
 import com.typesafe.sbt.web.pipeline.Pipeline
 import collection.mutable
 import mutable.ListBuffer
+import java.io.File
 
 object Import {
   val concat = TaskKey[Pipeline.Stage]("web-concat", "Concatenates groups of web assets")
