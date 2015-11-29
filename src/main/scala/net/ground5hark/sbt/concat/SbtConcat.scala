@@ -83,7 +83,7 @@ object SbtConcat extends AutoPlugin {
                   .append(s"\n/** $fileName **/\n")
                   .append(IO.read(mapping.head._1))
                 reverseMapping.remove(fileName)
-              }
+              } else streams.value.log.warn(s"Unable to process $fileName. Not found.")
             }
         }
 
