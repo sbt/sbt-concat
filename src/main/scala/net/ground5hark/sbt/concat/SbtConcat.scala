@@ -6,6 +6,7 @@ import sbt._
 import com.typesafe.sbt.web.pipeline.Pipeline
 import collection.mutable
 import mutable.ListBuffer
+import java.io.File
 
 object Import {
   val concat = TaskKey[Pipeline.Stage]("web-concat", "Concatenates groups of web assets")
@@ -76,7 +77,9 @@ object SbtConcat extends AutoPlugin {
         groupsValue.foreach {
           case (groupName, fileNames) =>
             fileNames.foreach { fileName =>
-              val mapping = filteredMappings.filter(_._2 == fileName)
+              val separator = File.separatorChar
+              def normalize(path: String) = path.replace('\\', separator).replace('/', separator)
+              val mapping = filteredMappings.filter(entry => normalize(entry._2) == normalize(fileName))
               if (mapping.nonEmpty) {
                 // TODO This is not as memory efficient as it could be, write to file instead
                 concatGroups.getOrElseUpdate(groupName, new StringBuilder)
