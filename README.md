@@ -43,6 +43,8 @@ Concat.groups := Seq(
 Note that with a `PathFinder`, you will need to take care to ensure that the files it selects will be concatenated in
 the order that you desire.
 
+To match entries in `Seq[String]` in group `PathMapping` is used. Only relative paths up to one level deep are guaranteed match.
+
 This will produce three files with concatenated contents:
 
 `style-group.css`
