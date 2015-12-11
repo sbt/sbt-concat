@@ -8,7 +8,7 @@ Plugin
 ======
 Add the plugin to your `project/plugins.sbt`:
 ```scala
-addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.8")
+addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.1.9")
 ```
 
 Add the [Sonatype releases] resolver:
