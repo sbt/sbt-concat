@@ -14,7 +14,7 @@ resolvers ++= Seq(
   Resolver.mavenLocal
 )
 
-addSbtWeb("1.4.2")
+addSbtWeb("1.4.3")
 
 publishMavenStyle := true
 
