@@ -54,22 +54,23 @@ object SbtConcat extends AutoPlugin {
       fileNames match {
         case Left(fileNamesSeq) => (groupName, fileNamesSeq)
         case Right(fileNamesPathFinder) =>
-          val r = fileNamesPathFinder.pair(relativeTo(srcDirs ++ webModuleDirs) | flat)
+          val r = fileNamesPathFinder.pair(Path.relativeTo(srcDirs ++ webModuleDirs) | sbt.io.Path.flat)
           (groupName, r.map(_._2))
         case u => sys.error(s"Expected Seq[String] or PathFinder, but got $u")
       }
   }
 
   private def concatFiles: Def.Initialize[Task[Pipeline.Stage]] = Def.task {
+    val logValue = streams.value.log
     mappings: Seq[PathMapping] =>
       val groupsValue = toFileNames(groups.value,
         (sourceDirectories in Assets).value,
         (webModuleDirectories in Assets).value)
 
       val groupMappings = if (groupsValue.nonEmpty) {
-        streams.value.log.info(s"Building ${groupsValue.size} concat group(s)")
+        logValue.info(s"Building ${groupsValue.size} concat group(s)")
         // Mutable map so we can pop entries we've already seen, in case there are similarly named files
-        val reverseMapping = ReverseGroupMapping.get(groupsValue, streams.value.log)
+        val reverseMapping = ReverseGroupMapping.get(groupsValue, logValue)
         val concatGroups = mutable.Map.empty[String, StringBuilder]
         val filteredMappings = mappings.filter(m => (includeFilter in concat).value.accept(m._1) && m._1.isFile)
         val targetDir = webTarget.value / parentDir.value
@@ -86,7 +87,7 @@ object SbtConcat extends AutoPlugin {
                   .append(s"\n/** $fileName **/\n")
                   .append(IO.read(mapping.head._1))
                 reverseMapping.remove(fileName)
-              } else streams.value.log.warn(s"Unable to process $fileName. Not found.")
+              } else logValue.warn(s"Unable to process $fileName. Not found.")
             }
         }
 
@@ -95,7 +96,7 @@ object SbtConcat extends AutoPlugin {
             val outputFile = targetDir / groupName
             IO.write(outputFile, concatenatedContents.toString())
             outputFile
-        }.pair(relativeTo(webTarget.value))
+        }.pair(Path.relativeTo(webTarget.value))
       } else {
         Seq.empty[PathMapping]
       }

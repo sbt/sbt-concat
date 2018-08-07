@@ -1,12 +1,10 @@
-sbtPlugin := true
+lazy val `sbt-concat` = project in file(".")
 
 organization := "net.ground5hark.sbt"
 
 name := "sbt-concat"
 
-version := "0.1.9"
-
-scalaVersion := "2.10.4"
+version := "0.1.10-SNAPSHOT"
 
 resolvers ++= Seq(
   "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
@@ -16,11 +14,11 @@ resolvers ++= Seq(
   Resolver.mavenLocal
 )
 
-addSbtPlugin("com.typesafe.sbt" %% "sbt-web" % "1.0.2")
+addSbtWeb("1.4.3")
 
 publishMavenStyle := true
 
-scriptedSettings
+//scriptedSettings
 
 scriptedLaunchOpts ++= Seq(
   "-Xmx1024M",
