@@ -1,13 +1,4 @@
-import com.typesafe.sbt.web.Import._
 import com.typesafe.sbt.web.Import.WebKeys._
-
-organization := "net.ground5hark.sbt"
-
-name := "sbt-concat-test"
-
-version := "0.1.10-SNAPSHOT"
-
-scalaVersion := "2.12.4"
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
