@@ -1,6 +1,6 @@
 sbt-concat
 ==========
-[![Build Status](https://api.travis-ci.org/sbt/sbt-concat.png?branch=master)](https://travis-ci.org/sbt/sbt-concat) [![Download](https://api.bintray.com/packages/sbt-web/sbt-plugin-releases/sbt-concat/images/download.svg)](https://bintray.com/sbt-web/sbt-plugin-releases/sbt-concat/_latestVersion)
+[![Build Status](https://github.com/sbt/sbt-concat/actions/workflows/build-test.yml/badge.svg)](https://github.com/sbt/sbt-concat/actions/workflows/build-test.yml)
 
 [sbt-web] plugin for concatenating files together, using the sbt-web asset pipeline.
 
@@ -8,7 +8,7 @@ Plugin
 ======
 Add the plugin to your `project/plugins.sbt`:
 ```scala
-addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.2.0")
+addSbtPlugin("com.github.sbt" % "sbt-concat" % "1.0.0")
 ```
 
 Enable the [sbt-web] plugin for your project:
