@@ -13,7 +13,7 @@ developers += Developer(
   url("https://github.com/playframework")
 )
 
-addSbtWeb("1.5.4")
+addSbtWeb("1.5.5")
 
 licenses := Seq("MIT" -> url("https://opensource.org/licenses/mit-license.php"))
 
