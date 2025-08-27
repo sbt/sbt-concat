@@ -5,10 +5,11 @@ import sbt.Keys._
 import sbt._
 import com.typesafe.sbt.web.pipeline.Pipeline
 import collection.mutable
-import mutable.ListBuffer
 import java.io.File
+import xsbti.FileConverter
 
 object Import {
+  @transient
   val concat = TaskKey[Pipeline.Stage]("web-concat", "Concatenates groups of web assets")
 
   object Concat {
@@ -41,7 +42,7 @@ object SbtConcat extends AutoPlugin {
   import Concat._
 
   override def projectSettings = Seq(
-    groups := ListBuffer.empty[ConcatGroup],
+    groups := Nil,
     concat / includeFilter := NotHiddenFileFilter,
     parentDir := "",
     concat := concatFiles.value
@@ -56,13 +57,12 @@ object SbtConcat extends AutoPlugin {
         case Right(fileNamesPathFinder) =>
           val r = fileNamesPathFinder.pair(Path.relativeTo(srcDirs ++ webModuleDirs) | Path.flat)
           (groupName, r.map(_._2))
-        case u => sys.error(s"Expected Seq[String] or PathFinder, but got $u")
       }
   }
 
   private def concatFiles: Def.Initialize[Task[Pipeline.Stage]] = Def.task {
     val logValue = streams.value.log
-    mappings: Seq[PathMapping] =>
+    (mappings: Seq[PathMapping]) =>
       val groupsValue = toFileNames(groups.value,
         (Assets / sourceDirectories).value,
         (Assets / webModuleDirectories).value)
@@ -72,7 +72,11 @@ object SbtConcat extends AutoPlugin {
         // Mutable map so we can pop entries we've already seen, in case there are similarly named files
         val reverseMapping = ReverseGroupMapping.get(groupsValue, logValue)
         val concatGroups = mutable.Map.empty[String, StringBuilder]
-        val filteredMappings = mappings.filter(m => (concat / includeFilter).value.accept(m._1) && m._1.isFile)
+        implicit val converter: FileConverter = fileConverter.value
+        val filteredMappings = mappings.filter{ m  =>
+          val f = SbtConcatCompat.toFile(m._1)
+          (concat / includeFilter).value.accept(f) && f.isFile
+        }
         val targetDir = webTarget.value / parentDir.value
 
         groupsValue.foreach {
@@ -85,7 +89,7 @@ object SbtConcat extends AutoPlugin {
                 // TODO This is not as memory efficient as it could be, write to file instead
                 concatGroups.getOrElseUpdate(groupName, new StringBuilder)
                   .append(s"\n/** $fileName **/\n")
-                  .append(IO.read(mapping.head._1))
+                  .append(IO.read(SbtConcatCompat.toFile(mapping.head._1)))
                 reverseMapping.remove(fileName)
               } else logValue.warn(s"Unable to process $fileName. Not found.")
             }
@@ -96,7 +100,9 @@ object SbtConcat extends AutoPlugin {
             val outputFile = targetDir / groupName
             IO.write(outputFile, concatenatedContents.toString())
             outputFile
-        }.pair(Path.relativeTo(webTarget.value))
+        }.pair(Path.relativeTo(webTarget.value)).map {
+          case (x1, x2) => (SbtConcatCompat.toFileRef(x1), x2)
+        }
       } else {
         Seq.empty[PathMapping]
       }
