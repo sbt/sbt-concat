@@ -11,7 +11,7 @@ developers += Developer(
   url("https://github.com/playframework")
 )
 
-addSbtWeb("1.6.0-M1")
+addSbtWeb("1.6.0-M2")
 
 crossScalaVersions += "3.7.4"
 
