@@ -1,6 +1,11 @@
 import com.typesafe.sbt.web.Import.WebKeys._
 
-lazy val root = (project in file(".")).enablePlugins(SbtWeb)
+lazy val root = (project in file("."))
+  .enablePlugins(SbtWeb)
+  .settings(
+    // Classic target layout so scripted checks keep working on sbt 2.
+    target := baseDirectory.value / "target"
+  )
 
 Concat.groups := Seq(
   "style-group.css" -> group(Seq("css/style1.css", "css/style2.css")),
