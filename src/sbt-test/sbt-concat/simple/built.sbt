@@ -1,6 +1,11 @@
 import com.typesafe.sbt.web.Import.WebKeys._
 
-lazy val root = (project in file(".")).enablePlugins(SbtWeb)
+lazy val root = (project in file("."))
+  .enablePlugins(SbtWeb)
+  .settings(
+    // Classic target layout so scripted checks keep working on sbt 2.
+    target := baseDirectory.value / "target"
+  )
 
 Concat.groups := Seq(
   "style-group.css" -> group(Seq("css/style1.css", "css/style2.css")),
@@ -14,9 +19,9 @@ val verifyConcatContents = taskKey[Unit]("Verify contents of concatenation group
 
 verifyConcatContents := {
   val pub = webTarget.value
-  val concatCss = (pub / "" ** "*style-group.css").get
-  val concatJs = (pub / "" ** "*script-group.js").get
-  val concatLibCss = (pub / "" ** "*style-libs.css").get
+  val concatCss = (pub / "" ** "*style-group.css").get()
+  val concatJs = (pub / "" ** "*script-group.js").get()
+  val concatLibCss = (pub / "" ** "*style-libs.css").get()
   def assertEqual(f: File, contains: Seq[String]): Unit = {
     val contents = IO.read(f)
     contains.foreach { s =>
@@ -39,13 +44,12 @@ val verifyAssetFiles = taskKey[Unit]("Verify that concat groups are files")
 
 verifyAssetFiles := {
   val pub = webTarget.value
-  val concatCss = (pub / "" ** "*style-group.css").get
-  val concatJs = (pub / "" ** "*script-group.js").get
-  val concatLibCss = (pub / "" ** "*style-libs.css").get
+  val concatCss = (pub / "" ** "*style-group.css").get()
+  val concatJs = (pub / "" ** "*script-group.js").get()
+  val concatLibCss = (pub / "" ** "*style-libs.css").get()
   Seq(concatCss, concatJs, concatLibCss).foreach { f =>
     val file = f.head
     if (!file.isFile || IO.read(file).isEmpty)
       sys.error(s"$file was not a file or was empty")
   }
 }
-

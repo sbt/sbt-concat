@@ -13,7 +13,7 @@ $ exists target/web/stage/js/file3.js
 > verifyConcatContents
 > clean
 
-> set pipelineStages in Assets := Seq(concat)
+> set Assets / pipelineStages := Seq(concat)
 > assets
 $ exists target/web/public/main/script-group.js
 $ exists target/web/public/main/style-group.css
